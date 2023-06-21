@@ -1,0 +1,49 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<%@ include file = "header.jsp" %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<script language="javascript" type="text/javascript">
+
+function doSubmit()
+{
+	
+     window.open("RegistrationSuccessful.jsp","_self");
+}
+	
+
+
+</script>
+<title>Registration</title>
+<body background="skyback.jpg"></body>
+</head>
+<body>
+
+<%if (session.getAttribute("username") == null) { %>
+<%
+        String redirectURL = "http://localhost:8082/Login-MySQL-SessionDetails/PleaseLogin.jsp";
+        response.sendRedirect(redirectURL);
+    %>
+ 
+<%} else { %>
+
+
+
+
+<p>Please fill form to add more details: User <%=session.getAttribute("username")%></p>
+    <hr>
+
+    <label for="email"><b>Email</b></label>
+    <input type="text" placeholder="Enter Email" name="email" id="email" required>
+
+    <label for="city"><b>City</b></label>
+    <input type="text" placeholder="Enter City" name="city" id="city" required>
+    
+    <button type="submit" onclick="doSubmit();">Register</button><br><br>
+    <div class="backleft"><a href="loginsuccess.jsp">Back</a></div>
+
+<%} %>
+</body>
+</html>

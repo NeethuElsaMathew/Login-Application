@@ -1,0 +1,25 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+ <%@ include file = "header.jsp" %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Restricted Access</title>
+<body background="skyback.jpg"></body>
+</head>
+<body>
+<%if (session.getAttribute("username") == null) { %>
+<%
+        String redirectURL = "http://localhost:8082/Login-MySQL-SessionDetails/PleaseLogin.jsp";
+        response.sendRedirect(redirectURL);
+    %>
+ 
+<%} else { %>
+<br>
+<br>
+<h3>This requested page is not accessible to the current user.Kindly <a href="loginsuccess.jsp">Click Here</a></h3>
+<%} %>
+</body>
+
+</html>

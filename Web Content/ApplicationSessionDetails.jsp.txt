@@ -1,0 +1,94 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<%@ page import = "java.io.*" %>
+<%@ page import = "java.text.DateFormat" %>
+<%@ page import = "java.util.Date" %>
+<%@ page import = "java.io.*" %>
+<%@ page import="net.javaguides.login.bean.LoginBean"%>
+<%@ page import="net.javaguides.login.database.LoginDao"%>
+<%@ include file = "header.jsp" %>
+<%@ page import="java.util.List"%>
+<%@ page import="java.util.Arrays"%>
+<%@ page import="java.util.Base64" %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+
+<style>
+.classleft{
+text-align:center;
+}
+
+</style>
+<title>Application Session Details</title>
+<body background="skyback.jpg"></body>
+</head>
+<body>
+
+<%if (session.getAttribute("username") == null) { %>
+<%
+        String redirectURL = "http://localhost:8082/Login-MySQL-SessionDetails/PleaseLogin.jsp";
+        response.sendRedirect(redirectURL);
+%>
+ 
+<%}else { %>
+<%
+  String pageName="App";
+  LoginDao objectUser=new LoginDao(); 
+  String username=(String)session.getAttribute("username") ;
+  String userRole=null;
+  userRole=objectUser.getUserRole(username);
+  System.out.println("Role in jsp"+userRole);
+  String pages=null;
+  pages=objectUser.getUserRolePages(userRole);
+  int count=0;
+  
+  List<String> pagesList = Arrays.asList(pages.split(","));%>
+  
+<% for (int i = 0; i < pagesList.size(); i++) {%>
+	   <%  if(pagesList.get(i).equals(pageName)) 
+        count=1;%>
+
+<%}%>
+<%if(count==1){ %>
+
+<% 
+   String userUniqueId;
+   String userCurrentLogin;
+   String userLastLogin;
+   String userPassword;
+   LoginDao objFunctionDao=new LoginDao();
+   String decoded;
+   //String username=(String)session.getAttribute("username");
+   String password=(String)session.getAttribute("password");
+   
+   
+   userPassword=objFunctionDao.getPassword(username);
+   userUniqueId=objFunctionDao.getAppUserIds(username,userPassword);
+   userCurrentLogin=objFunctionDao.getUserLastLogin(username);
+   userLastLogin=objFunctionDao.getUserLastLogout(username);
+   
+   
+   
+   
+   
+   
+ %>
+
+<div class="classleft"><h2>Displaying the Application Session Details</h2></div><br>
+<div class="classleft">User Logged In : <%=username%></div><br>
+<div class="classleft">Unique Id Created: <%=userUniqueId%></div><br>
+<div class="classleft">The time and date of current login: <%=userCurrentLogin%></div><br>
+<div class="classleft">The session creation time: <%=userCurrentLogin%></div><br>
+<div class="classleft">Last Accessed Time:  <%=userLastLogin%></div><br><br>
+<div class="classleft"><a href="loginsuccess.jsp">Back</a></div>
+<%} else { %>
+
+<%String redirectURL = "http://localhost:8082/Login-MySQL-SessionDetails/RestrictedAccess.jsp";
+response.sendRedirect(redirectURL); %>
+<%}%>
+ 
+<%} %> 
+</body>
+</html>

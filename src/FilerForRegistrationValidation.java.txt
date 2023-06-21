@@ -1,0 +1,176 @@
+package net.javaguides.login.web;
+
+import java.io.IOException;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
+
+/**
+ * Servlet Filter implementation class FilterForRegistrationValidation
+ */
+@WebFilter("/Registration")
+public class FilterForRegistrationValidation implements Filter {
+
+ 
+	
+	public void destroy() {
+		
+	}
+
+	
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+		
+		String firstname = request.getParameter("firstname");
+		
+		String lastname = request.getParameter("lastname");
+		String username = request.getParameter("username");
+		String password = request.getParameter("password");
+		String cpassword = request.getParameter("confirmpassword");
+		String address = request.getParameter("address");
+		String contactnumber = request.getParameter("contactnumber");
+	    String emailId=request.getParameter("email");
+		String userrole=request.getParameter("role");
+		String EMAIL_REGEX = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
+		int count=0;
+		
+		if(firstname.equals(""))
+		{
+			String msg="First name cannot be empty";
+			request.setAttribute("msg",msg);
+			count=1;
+			//request.getRequestDispatcher("RegistrationPage.jsp").forward(request, response);
+		}
+		else if(!firstname.matches("^[a-zA-Z]*$"))
+				{
+			  String msg="First name should contain only alphabets";
+			  request.setAttribute("msg",msg);
+			  count=1;
+				}
+		
+		if(lastname.equals(""))
+		{
+			String msg1="First name cannot be empty";
+			request.setAttribute("msg1",msg1);
+			count=1;
+			
+		}
+		
+		else if(!lastname.matches("^[a-zA-Z]*$"))
+				{
+			  String msg1="Last name should contain only alphabets";
+			  request.setAttribute("msg1",msg1);
+			  count=1;
+				}
+		
+		if(username.equals(""))
+		{
+			String msg2="User name cannot be empty";
+			request.setAttribute("msg2",msg2);
+			count=1;
+			
+		}
+		
+		if(password.equals(""))
+		{
+			String msg3="Password name cannot be empty";
+			request.setAttribute("msg3",msg3);
+			
+		}
+		else if(password.length()<8)
+		{
+			String msg3="Password should be 8 character long";
+			request.setAttribute("msg3",msg3);
+			count=1;
+		}
+		else if(password.matches("^[a-zA-Z]*$"))
+		{
+			String msg3="Password should contain both alphabets and numeric values";
+			request.setAttribute("msg3",msg3);
+			count=1;
+		}
+		if(cpassword.equals(""))
+		{
+			String msg8="Confirm Password name cannot be empty";
+			request.setAttribute("msg8",msg8);
+		}
+		
+		else if(!password.equals(cpassword))
+		{
+			String msg8="Passwords doesnt match";
+			request.setAttribute("msg8",msg8);
+			count=1;
+		}
+		
+		
+		
+		if(address.equals(""))
+		{
+			String msg4="Address name cannot be empty";
+			request.setAttribute("msg4",msg4);
+			count=1;
+			
+		}
+		
+		if(emailId.equals(""))
+		{
+			String msg6="Email Id cannot be empty";
+			request.setAttribute("msg6",msg6);
+			count=1;
+		}
+		else if(!emailId.matches(EMAIL_REGEX))
+		{
+			String msg6="Enter a vaild format Email Id";
+			request.setAttribute("msg6",msg6);
+			count=1;
+		}
+		
+		if(contactnumber.equals(""))
+		{
+			String msg5="Number name cannot be empty";
+			request.setAttribute("msg5",msg5);
+			count=1;
+		}
+		else if(contactnumber.length()!=10)
+		{
+			String msg5="Enter valid 10 digit number";
+			request.setAttribute("msg5",msg5);
+			count=1;
+		}
+		else if(!contactnumber.matches("^[0-9]*$"))
+		{
+			String msg5="Password should contain only numeric values";
+			request.setAttribute("msg5",msg5);
+			count=1;
+		}
+		
+		
+		if(userrole.equals(""))
+		{
+			String msg7="User Role cannot be empty";
+			request.setAttribute("msg7",msg7);
+			count=1;
+		}
+		if(count==1)
+		{
+		  request.getRequestDispatcher("RegistrationPage.jsp").forward(request, response);
+		}
+		
+				
+		else {
+			chain.doFilter(request, response);	
+		}
+		
+	}
+
+	/**
+	 * @see Filter#init(FilterConfig)
+	 */
+	public void init(FilterConfig fConfig) throws ServletException {
+		// TODO Auto-generated method stub
+	}
+
+}

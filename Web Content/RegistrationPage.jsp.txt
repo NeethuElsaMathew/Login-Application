@@ -1,0 +1,219 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+ pageEncoding="ISO-8859-1"%>
+
+ 
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+<title>Registration Page</title>
+<body background="skyback.jpg"></body>
+
+<script>  
+
+
+function validateform(){  
+	
+	
+	
+
+var name=document.forms["Registration"]["firstname"];
+var namelast=document.forms["Registration"]["lastname"]; 
+var username=document.forms["Registration"]["username"];
+var password=document.forms["Registration"]["password"];
+var cpassword=document.forms["Registration"]["confirmpassword"];
+var address=document.forms["Registration"]["address"]; 
+var email=document.forms["Registration"]["email"]; 
+var number=document.forms["Registration"]["contactnumber"];
+var userrole=document.forms["Registration"]["role"];
+var emailid=email.value;
+
+var atposition=emailid.indexOf("@");  
+var dotposition=emailid.lastIndexOf(".")
+
+
+if (name.value==null || name.value ==""){  
+  alert("FirstName can't be blank");  
+  
+  return false;  
+}
+
+else if(!name.value.match(/^[a-zA-Z]+$/))
+{
+	alert("FirstName should contain only alphabets");  
+	  
+	return false; 
+}
+
+else if (namelast.value==null || namelast.value==""){  
+	  alert("LastName can't be blank");  
+	  
+	  return false;  
+	}
+	
+else if(!namelast.value.match(/^[a-zA-Z]+$/))
+{
+	alert("LastName should contain only alphabets");  
+	  
+	return false; 
+}
+
+
+else if (username.value==null || username.value==""){  
+	  alert("UserName can't be blank");  
+	  
+	  return false;  
+	}
+
+else if(password.value.length<8){  
+  alert("Password must be at least 8 characters long.");  
+
+  return false;  
+  }
+  
+else if(password.value.match(/^[a-zA-Z]+$/))
+{
+	alert("Password should contain both alphabets and numeric values");  
+	  
+	return false; 
+}
+else if(password.value!=cpassword.value){  
+	  alert("Passwords doesnt match.");  
+	 
+	  return false;  
+	  } 
+	  
+else if (address.value==null || address.value==""){  
+	  alert("Address can't be blank");  
+	  
+	  return false;  
+	}
+	
+else if (email.value==null || email.value==""){  
+	  alert("Email Id can't be blank");  
+	  
+	  return false;  
+	}
+
+	
+	
+else if (number.value==null || number.value==""){  
+	  alert("Contact Number can't be blank");  
+	  
+	  return false;  
+	}
+else if(!number.value.match(/^[0-9]+$/))
+{
+	alert("Contact number should contain only numeric values");  
+	  
+	return false; 
+}
+
+else if(number.value.length!=10){  
+	  alert("Enter a vaild 10 digit mobile number");  
+
+	  return false;  
+	  }
+	  
+else if(userrole.value=="" || userrole.value==null){  
+	  alert("User role cannot be null");  
+
+	  return false;  
+	  }
+	 
+	 
+else if (atposition<1 || dotposition<atposition+2 || dotposition+2>=x.length){  
+	  alert("Please enter a valid e-mail address");  
+	  
+	  return false;  
+	}	
+
+}  
+</script>
+</head>
+<body>
+
+
+ <div align="center">
+  <h1>Registration</h1>
+  <form name="Registration" action="Registration" method=post onsubmit="return validateform();" >
+   <table style="with: 100%">
+   <tr>
+     <td>First Name</td>
+     <td><input type="text" name="firstname"  /></td>
+    </tr>
+    <tr>
+    </tr>
+     <tr>
+     <td>Last Name</td>
+     <td><input type="text" name="lastname" /></td>
+    </tr>
+     <tr>
+    </tr>
+    
+    <tr>
+     <td>Username</td>
+     <td><input type="text" name="username" /></td>
+    </tr>
+     <tr>
+    </tr>
+    
+     <tr>
+     <td>Password</td>
+     <td><input type="password" name="password" /></td>
+    </tr>
+     <tr>
+    </tr>
+    
+    <tr>
+     <td>Confirm Password</td>
+     <td><input type="password" name="confirmpassword" /></td>
+    </tr>
+     <tr>
+    </tr>
+    
+    <tr>
+     <td>Address</td>
+     <td><input type="text" name="address" /></td>
+    </tr>
+     <tr>
+    </tr>
+    
+     <tr>
+     <td>Email Id</td>
+     <td><input type="text" name="email" /></td>
+    </tr>
+     <tr>
+    </tr>
+    
+    
+    <tr>
+     <td>Contact Number</td>
+     <td><input type="text" name="contactnumber" /></td>
+    </tr>
+    <tr>
+    </tr>
+    
+     <tr>
+     <td>User Role</td>
+     <td><select name="role"><option><option>Admin</option><option>User</option><option>SuperUser</option></select></td>
+    </tr>
+     <tr>
+    </tr>
+   
+     
+    
+     <tr>
+         <td></td>
+    
+   
+   <td>
+   <input type="submit" style="background-color:red" value="Submit"  name="Submit" /></td>
+   </tr>
+   </table>
+   </form>
+ </div>
+</body>
+
+</html>

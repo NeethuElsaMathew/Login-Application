@@ -1,0 +1,18 @@
+package net.javaguides.login.bean;
+
+public class CurrentLoginTime {
+	
+	private String storeTime;
+	
+	public String getStoreTime() {
+        return storeTime;
+    }
+
+    public void setStoreTime(String storeTime) {
+        this.storeTime = storeTime;
+        
+		
+    }
+	
+
+}

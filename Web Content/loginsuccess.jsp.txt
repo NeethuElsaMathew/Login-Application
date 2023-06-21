@@ -1,0 +1,102 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+ pageEncoding="ISO-8859-1"%>
+<%@page import="net.javaguides.login.database.*"%>
+<%@ include file = "header.jsp" %>
+<%@ page import="java.util.List"%>
+<%@ page import="java.util.Arrays"%>
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+ <script type="javascript">
+ function navigate( linkURL ) {
+	  onunload = "";
+	  document.location = linkURL;
+	}	
+</script>
+
+<title>Welcome</title>
+<body background="skyback.jpg"></body>
+</head>
+<body>
+<body onbeforeunload="navigate(http://localhost:8082/Login-MySQL-SessionDetails/Logout.jsp)">
+ <div align="center">
+
+
+<%if (session.getAttribute("username") == null) { %>
+<%
+        String redirectURL = "http://localhost:8082/Login-MySQL-SessionDetails/PleaseLogin.jsp";
+        response.sendRedirect(redirectURL);
+    %>
+ 
+<%} else { %>
+<h3>Logged in User:<%=session.getAttribute("username")%></h3><br>
+
+<%
+  String pageNameUser="user";
+  String pageNameSession="session";
+  String pageNameApplication="App";
+  String pageNameCanvas="canvas";
+  LoginDao objectUser=new LoginDao(); 
+  String username=(String)session.getAttribute("username") ;
+  String userRole=null;
+  userRole=objectUser.getUserRole(username);
+  System.out.println("Role in jsp"+userRole);
+  String pages=null;
+  pages=objectUser.getUserRolePages(userRole);
+  int countUser=0;
+  int countSession=0;
+  int countApp=0;
+  int countCanvas=0;
+ 
+  List<String> pagesList = Arrays.asList(pages.split(","));%>
+  
+  <% for (int i = 0; i < pagesList.size(); i++) {%>
+	   <%  if(pagesList.get(i).equals(pageNameUser)) 
+        countUser=1;%>
+        <%  if(pagesList.get(i).equals(pageNameSession)) 
+        countSession=1;%>
+        <%  if(pagesList.get(i).equals(pageNameApplication)) 
+        countApp=1;%>
+        <%  if(pagesList.get(i).equals(pageNameCanvas)) 
+        countCanvas=1;%>
+
+<%}%>
+
+<%if(countUser==1){ %>
+
+  <h3><a href="UserDetails.jsp" id="Session">Click here for User details</a></h3>
+  
+ <%} %> 
+ 
+ <%if(countSession==1){ %>
+  
+  <h3><a href="SessionDetailsPage.jsp" id="Session">Click here for session details</a></h3>
+  
+ <%} %> 
+ 
+<%if(countApp==1){ %>
+  
+  <h3><a href="ApplicationSessionDetails.jsp" id="Application">Click here for Application session details</a></h3>
+  
+<%} %> 
+
+<%if(countCanvas==1){ %>
+  
+  <h3><a href="CanvasFingerPrinting.jsp" id="Application">Click here for Browser FingerPrinting Details</a></h3>
+  
+<%} %>
+ 
+ 
+ </div>
+
+
+<%} %>
+
+  
+  
+</body>
+
+</html>

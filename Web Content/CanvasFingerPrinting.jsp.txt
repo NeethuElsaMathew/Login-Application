@@ -1,0 +1,90 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<%@ page import="net.javaguides.login.bean.LoginBean"%>
+<%@ page import="net.javaguides.login.database.LoginDao"%>
+<%@ include file = "header.jsp" %>
+<%@ page import="java.util.List"%>
+<%@ page import="java.util.Arrays"%>
+<!DOCTYPE html>
+<html>
+<body>
+<head>
+<style>
+.classleft{
+text-align:center;
+}
+
+</style>
+<title>Canvas FingerPrinting</title>
+</head>
+<body background="skyback.jpg"></body>
+<div></div><br>
+<div></div><br>
+
+<h2>Finger Printing Details</h2>
+<br>
+<%if (session.getAttribute("username") == null) { %>
+<%
+        String redirectURL = "http://localhost:8082/Login-MySQL-SessionDetails/PleaseLogin.jsp";
+        response.sendRedirect(redirectURL);
+ %>
+<%}else { %>
+<% 
+String pageName="canvas";
+  LoginDao objectUser=new LoginDao(); 
+  String username=(String)session.getAttribute("username") ;
+  String userRole=null;
+  userRole=objectUser.getUserRole(username);
+  String pages=null;
+  pages=objectUser.getUserRolePages(userRole);
+  int count=0;
+  List<String> pagesList = Arrays.asList(pages.split(","));%>
+
+<% for (int i = 0; i < pagesList.size(); i++) {%>
+	   <%  if(pagesList.get(i).equals(pageName)) 
+        count=1;%>
+
+<%}%>
+<%if(count==1){ %>
+<canvas id="myCanvas" width="200" height="100" style="border:1px solid #d3d3d3;">
+Your browser does not support the HTML canvas tag.</canvas>
+
+<script>
+var c = document.getElementById("myCanvas");
+var ctx = c.getContext("2d");
+ctx.font = "30px Arial";
+ctx.fillText("Hello World",10,50);
+var canvas = document.getElementById('myCanvas');
+var dataURL = canvas.toDataURL();
+document.write("<br>");
+document.write("<br>");
+document.write("Base 64 Encoded Value=");
+document.write(dataURL);
+document.write("<br>");
+// Convert to 32bit integer 
+function stringToHash(string) { 
+        var hash = 0; 
+      
+    if (string.length == 0) return hash; 
+      
+    for (i = 0; i < string.length; i++) { 
+        char = string.charCodeAt(i); 
+        hash = ((hash << 5) - hash) + char; 
+        hash = hash & hash; 
+    } 
+        return hash; 
+} 
+var encoded=stringToHash(dataURL); 
+document.write("Hashed Value/Interger Value");
+document.write(encoded);
+</script>
+<%} else { %>
+
+<%String redirectURL = "http://localhost:8082/Login-MySQL-SessionDetails/RestrictedAccess.jsp";
+response.sendRedirect(redirectURL); %>
+<%}%>
+ 
+<%} %>
+<div><div class="classleft"><a href="loginsuccess.jsp">Back</a></div></div>
+</body>
+</html>

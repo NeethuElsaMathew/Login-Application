@@ -1,0 +1,78 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<%@ page import = "java.io.*" %>
+<%@ page import = "java.text.DateFormat" %>
+<%@ page import = "java.util.Date" %>
+<%@ page import = "java.io.*" %>
+<%@ page import="net.javaguides.login.bean.LoginBean"%>
+<%@ page import="net.javaguides.login.database.LoginDao"%>
+<%@ include file = "header.jsp" %>
+<%@ page import="java.util.List"%>
+<%@ page import="java.util.Arrays"%>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+
+<style>
+.classleft{
+text-align:center;
+}
+
+</style>
+<title>Session Details</title>
+<body background="skyback.jpg"></body>
+</head>
+<body>
+<%if (session.getAttribute("username") == null) { %>
+<%
+        String redirectURL = "http://localhost:8082/Login-MySQL-SessionDetails/PleaseLogin.jsp";
+        response.sendRedirect(redirectURL);
+ %>
+<%}else { %>
+<%
+  String pageName="session";
+  LoginDao objectUser=new LoginDao(); 
+  String username=(String)session.getAttribute("username") ;
+  String userRole=null;
+  userRole=objectUser.getUserRole(username);
+  System.out.println("Role in jsp"+userRole);
+  String pages=null;
+  pages=objectUser.getUserRolePages(userRole);
+  int count=0;
+  
+  List<String> pagesList = Arrays.asList(pages.split(","));%>
+  
+<% for (int i = 0; i < pagesList.size(); i++) {%>
+	   <%  if(pagesList.get(i).equals(pageName)) 
+        count=1;%>
+
+<%}%>
+<%if(count==1){ %>
+<% 
+Date creationTime = new Date(session.getCreationTime() );
+Date lastAccessed = new Date(session.getLastAccessedTime());
+
+Date now = new Date();
+DateFormat formatter = DateFormat.getDateTimeInstance(DateFormat.MEDIUM,DateFormat.MEDIUM);
+String idcreated=new String(session.getId());
+%>
+<div class="classleft"><h2>Displaying the Session Details</h2></div><br>
+<div class="classleft">Unique Id Created: <%=idcreated%></div><br>
+<!--  <div class="classleft">The time and date of current login: <%=formatter.format(now)%></div><br> -->
+<div class="classleft">The session creation time: <%=formatter.format(creationTime) %></div><br>
+<!--<div class="classleft">Last Accessed Time:  <%=formatter.format(lastAccessed)%></div><br><br> -->
+<div class="classleft"><a href="loginsuccess.jsp">Back</a></div>
+
+<%} else { %>
+
+<%String redirectURL = "http://localhost:8082/Login-MySQL-SessionDetails/RestrictedAccess.jsp";
+response.sendRedirect(redirectURL); %>
+<%}%>
+ 
+<%} %> 
+
+
+</body>
+</html>

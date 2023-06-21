@@ -1,0 +1,62 @@
+package net.javaguides.login.web;
+
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
+
+import net.javaguides.login.bean.LoginBean;
+import net.javaguides.login.database.LoginDao;
+
+
+@WebServlet("/Registration")
+public class Registration extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	static final Logger LOGGER = Logger.getLogger(Registration.class);
+	 private LoginDao loginDao;
+	 public void init() {
+	        loginDao = new LoginDao();      
+	    }
+  
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		String firstname = request.getParameter("firstname");
+		String lastname = request.getParameter("lastname");
+		String username = request.getParameter("username");
+		String password = request.getParameter("password");
+		String address = request.getParameter("address");
+		String contactnumber = request.getParameter("contactnumber");
+		String appid="A";
+		String emailId=request.getParameter("email");
+		String userrole=request.getParameter("role");
+		
+		LoginBean loginBean = new LoginBean();
+		loginBean.setFirstname(firstname);
+		loginBean.setLastname(lastname);
+		loginBean.setUsername(username);
+		loginBean.setPassword(password);
+		loginBean.setAddress(address);
+		loginBean.setContact(contactnumber);
+		loginBean.setAppuserid(appid);
+		loginBean.setEmail(emailId);
+		loginBean.setRole(userrole);
+		
+		try {
+			loginDao.updateUserDetails(loginBean);
+			LOGGER.info("A new user registered");
+			LOGGER.info(username);
+		    LOGGER.info("Redirected to Registration Successful");
+			response.sendRedirect("RegistrationSuccessful.jsp");
+		} catch (ClassNotFoundException e) {
+			
+			e.printStackTrace();
+			LOGGER.error("Error occured at Registration Servlet:",e);
+		}
+		
+	}
+
+}

@@ -1,0 +1,153 @@
+package net.javaguides.login.web;
+
+
+import java.io.IOException;
+
+import java.sql.Timestamp;
+import java.util.Date;
+
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.text.DateFormat;
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import java.util.*;
+
+import net.javaguides.login.bean.CurrentLoginTime;
+import net.javaguides.login.bean.LoginBean;
+import net.javaguides.login.database.LoginDao;
+
+import org.apache.log4j.Logger;
+
+
+@WebServlet("/login")
+public class LoginServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    static final Logger LOGGER = Logger.getLogger(LoginServlet.class);
+   
+    
+    private LoginDao loginDao;
+    private LoginDao loginBefore;
+    String lastAppId=null;
+
+    public void init() {
+        loginDao = new LoginDao();
+        loginBefore=new LoginDao();
+        
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
+    	
+    	
+        String username = request.getParameter("username");
+        String sessionUsername= (String) request.getSession().getAttribute("username");
+        
+        HttpSession session = request.getSession(false);
+        session.setMaxInactiveInterval(10*60);
+        System.out.println("sessionUsername="+sessionUsername+ ":=" +username);
+        String password = request.getParameter("password");
+        String sessionPassword= (String) request.getSession().getAttribute("password");
+        
+        LoginBean loginBean = new LoginBean();
+        loginBean.setUsername(username);
+        loginBean.setPassword(password);
+         
+        String appIdDefault="A";
+        
+        loginBean.setAppUserId(appIdDefault);
+        
+        
+        String appName="ApplicationTeam";
+		String userCode=username;
+		Date date= new Date();
+         
+	    long time = date.getTime();
+         
+	    Timestamp ts = new Timestamp(time);
+	    System.out.println("Current Time Stamp: "+ts);
+	 
+	    String currentTime=ts.toString();
+	 
+	    String AppId=userCode+appName+currentTime;
+	    
+	    System.out.println("Current AppId before encoding: "+AppId);
+	 
+	    String BasicBase64format = Base64.getEncoder() 
+           .encodeToString(AppId.getBytes()).toString();
+	    
+	    System.out.println("Current AppId: "+BasicBase64format);
+	    
+	    String AppSession=session.getId();
+	    
+	   
+	    
+	    
+	   //get last loggout time from backend
+	    try {
+			 lastAppId=loginBefore.getAppUserIds(username,password);
+		} catch (ClassNotFoundException e1) {
+
+			e1.printStackTrace();
+		}
+	    
+        
+        
+
+        try {
+        	
+        	if (loginDao.validate(loginBean)) {
+        		
+        		if(session==null)
+        		{
+        			response.sendRedirect("logout.jsp");
+        		}
+        		
+                  else {
+        			
+        			if(sessionUsername==null)
+        		    {
+        			    session.setAttribute("username",username);
+        			    
+        			    loginDao.getAppStatus(username,BasicBase64format,AppSession);
+        			    loginDao.currentLoginTime(username);
+        			    LOGGER.info("Successful login and redirecting to login success page for user");
+        			    LOGGER.info(username);
+        			    response.sendRedirect("loginsuccess.jsp");
+        		    }
+        		
+        		    
+        		    
+        			else if(sessionUsername!=null) {
+        				LOGGER.info("Redirected to Login Page");
+        		    	response.sendRedirect("login.jsp");
+        		         }
+        			
+        			
+        		
+        		}     }
+      else {
+        		if(lastAppId!="A" && lastAppId!=null) {
+        			
+        			LOGGER.info("This user is already logged in");
+        			LOGGER.info(username);
+        			response.sendRedirect("AlreadyLoggedIn.jsp");
+        			
+        		}
+        		else {
+        			LOGGER.info("Invalid credentials");
+                    response.sendRedirect("Invalid.jsp");
+        		
+        		}
+        	}
+        	
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            LOGGER.error("Error occured at LoginServlet:",e);
+        }
+    }
+}

@@ -1,0 +1,85 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<%@ page import = "java.io.*" %>
+<%@ page import = "java.text.DateFormat" %>
+<%@ page import = "java.util.Date" %>
+<%@ page import = "java.io.*" %>
+<%@ page import="net.javaguides.login.bean.LoginBean"%>
+<%@ page import="net.javaguides.login.database.LoginDao"%>
+<%@ include file = "header.jsp" %>
+<%@ page import="java.util.List"%>
+<%@ page import="java.util.Arrays"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+
+<style>
+.classleft{
+text-align:center;
+}
+
+</style>
+<title>User Details</title>
+<body background="skyback.jpg"></body>
+</head>
+<body>
+
+<%if (session.getAttribute("username") == null) { %>
+<%
+        String redirectURL = "http://localhost:8082/Login-MySQL-SessionDetails/PleaseLogin.jsp";
+        response.sendRedirect(redirectURL);
+  %>
+ 
+<%}else { %>
+<%
+  String pageName="user";
+  LoginDao objectUser=new LoginDao(); 
+  String username=(String)session.getAttribute("username") ;
+  String userRole=null;
+  userRole=objectUser.getUserRole(username);
+  System.out.println("Role in jsp"+userRole);
+  String pages=null;
+  pages=objectUser.getUserRolePages(userRole);
+  int count=0;
+  
+  List<String> pagesList = Arrays.asList(pages.split(","));%>
+  
+<% for (int i = 0; i < pagesList.size(); i++) {%>
+	   <%  if(pagesList.get(i).equals(pageName)) 
+        count=1;%>
+
+<%}%>
+<%if(count==1){ %>
+
+<% 
+  LoginDao detailsFunction=new LoginDao();
+    
+    String user=(String)session.getAttribute("username");
+    String firstname=detailsFunction.getDetailsBackendFirstName(user);
+    String lastname=detailsFunction.getDetailsBackendLastName(user);
+    String address=detailsFunction.getDetailsAddress(user);
+    String email=detailsFunction.getDetailsEmailId(user);
+    String number=detailsFunction.getDetailsNumber(user);
+    String role=detailsFunction.getUserRole(user);
+ %>
+ 
+<div class="classleft"><h2>Displaying the User Details</h2></div><br>
+<div class="classleft">User Logged In : <%=session.getAttribute("username")%></div><br>
+<div class="classleft">FirstName:<%=firstname%> </div><br>
+<div class="classleft">LastName: <%=lastname%></div><br>
+<div class="classleft">Address: <%=address%></div><br>
+<div class="classleft">Email Id:  <%=email%></div><br>
+<div class="classleft">Contact Number:  <%=number%></div><br><br>
+<div class="classleft">Current Role:  <%=role%></div><br><br>
+<div class="classleft"><a href="loginsuccess.jsp">Back</a></div>
+
+<%} else { %>
+
+<%String redirectURL = "http://localhost:8082/Login-MySQL-SessionDetails/RestrictedAccess.jsp";
+response.sendRedirect(redirectURL); %>
+<%}%>
+ 
+<%} %> 
+</body>
+</html>

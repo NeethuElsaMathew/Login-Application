@@ -1,0 +1,652 @@
+package net.javaguides.login.database;
+
+
+import java.sql.Connection;
+
+
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.Base64;
+import java.util.Date;
+import org.apache.log4j.Logger;
+
+
+import net.javaguides.login.bean.LoginBean;
+import net.javaguides.login.web.LoginServlet;
+
+/**
+ 
+/**
+ * @author neeth
+ *
+ */
+public class LoginDao {
+	static final Logger LOGGER = Logger.getLogger(LoginServlet.class);
+	private static final String connectionString="jdbc:mysql://localhost:3306/employee?useSSL=false";
+	
+	//Encrypted Database UserName
+	String encodedUserName = "cm9vdA==";
+	byte[] actualUserName = Base64.getDecoder() .decode(encodedUserName);  
+	String connectionUserName= new String(actualUserName);
+	
+	//Encrypted Database Password
+	String encodedPassword = "MTIzNDU=";
+	byte[] actualPassword = Base64.getDecoder() .decode(encodedPassword);  
+	String connectionPassword= new String(actualPassword);
+	
+	
+    public boolean validate(LoginBean loginBean) throws ClassNotFoundException {
+        boolean status = false;
+    
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        try (Connection connection = DriverManager
+            .getConnection(connectionString,connectionUserName,connectionPassword);
+
+            // Step 2:Create a statement using connection object
+        	
+            PreparedStatement preparedStatement = connection
+            .prepareStatement("select * from login where username = ? and password = ? and appuserid = ? ")) {
+            preparedStatement.setString(1, loginBean.getUsername());
+            preparedStatement.setString(2, loginBean.getPassword());
+            preparedStatement.setString(3, loginBean.getAppUserId());
+            
+            System.out.println(preparedStatement);
+            
+            
+            ResultSet rs = preparedStatement.executeQuery();
+            
+            status = rs.next();
+            
+
+        } catch (SQLException e) {
+            LOGGER.error("Error occured at validate function :",e);
+            printSQLException(e);
+        }
+        System.out.println("returnvalue="+status);
+        return status;
+    }
+    
+
+    
+
+ 
+public String getDetailsSession(String userId) throws ClassNotFoundException {
+     
+     String c=null;
+
+     Class.forName("com.mysql.jdbc.Driver");
+
+     try (Connection connection = DriverManager
+         .getConnection(connectionString,connectionUserName,connectionPassword);
+
+         // Step 2:Create a statement using connection object
+         PreparedStatement preparedStatement = connection
+         .prepareStatement("select * from login where username = ? ")) {
+         preparedStatement.setString(1, userId);
+        
+         
+         System.out.println(preparedStatement);
+         
+         ResultSet rs = preparedStatement.executeQuery();
+         
+           c=rs.getString("appsessionId");
+          
+
+     } catch (SQLException e) {
+         // process sql exception
+         printSQLException(e);
+         LOGGER.error("Error occured at getDetailsSession function:",e);
+     }
+     return c;
+ }
+ 
+ //Code to update in backend to assigned values
+
+public void getAppStatus(String userID,String appId,String appSession) throws ClassNotFoundException {
+    
+
+	String sql="update login set appuserid=?,appsessionId=? where username=?";
+
+    Class.forName("com.mysql.cj.jdbc.Driver");
+    try (Connection connection = DriverManager
+        .getConnection(connectionString,connectionUserName,connectionPassword);
+
+        PreparedStatement preparedStatement = connection
+        .prepareStatement(sql)) {
+        preparedStatement.setString(1, appId);
+        preparedStatement.setString(2, appSession);
+        preparedStatement.setString(3, userID);
+        
+        System.out.println(preparedStatement);
+        
+        int rowsAffected = preparedStatement.executeUpdate() ;
+        System.out.print(rowsAffected);
+ 
+    } catch (SQLException e) {
+    	LOGGER.error("Error occured at getAppStatus function:",e);
+        printSQLException(e);
+    }
+    
+}
+     
+   //Code to update in backend to assigned values to null
+
+public void getAppStatusToNull(String userID) throws ClassNotFoundException {
+    
+String sql="update login set appuserid=?,appsessionId=? where username=?";
+String status="A";
+
+    Class.forName("com.mysql.cj.jdbc.Driver");
+    try (Connection connection = DriverManager
+        .getConnection(connectionString,connectionUserName,connectionPassword);
+
+        PreparedStatement preparedStatement = connection
+        .prepareStatement(sql)) {
+        preparedStatement.setString(1, status);
+        preparedStatement.setString(2, status);
+        preparedStatement.setString(3, userID);
+        
+        System.out.println(preparedStatement);
+        
+        int rowsAffected = preparedStatement.executeUpdate() ;
+        System.out.print(rowsAffected);
+ 
+    } catch (SQLException e) {
+        // process sql exception
+    	LOGGER.error("Error occured at getAppStatusToNull function:",e);
+        printSQLException(e);
+    }
+    
+}
+     
+public void currentLoginTime(String currentUser) throws ClassNotFoundException {
+    
+String sql="update login set lastLogin=? where username=?";
+Date date= new Date();
+            
+long time = date.getTime();
+             
+Timestamp ts = new Timestamp(time);
+System.out.println("Current Time Stamp: "+ts);
+String currentTime=ts.toString();
+
+
+
+   Class.forName("com.mysql.cj.jdbc.Driver");
+   try (Connection connection = DriverManager
+       .getConnection(connectionString,connectionUserName,connectionPassword);
+
+       PreparedStatement preparedStatement = connection
+       .prepareStatement(sql)) {
+       preparedStatement.setString(1,currentTime);
+       preparedStatement.setString(2,currentUser);
+       
+       
+       System.out.println(preparedStatement);
+       
+       int rowsAffected = preparedStatement.executeUpdate() ;
+       
+
+   } catch (SQLException e) {
+       // process sql exception
+	   LOGGER.error("Error occured at currentLoginTime function:",e);
+       printSQLException(e);
+   }
+   
+}
+  
+  
+    
+ //Functions to get appid,sessionid,current and last login from backend 
+     
+     public String getUserLastLogin(String username) throws ClassNotFoundException {
+         
+         String c=null;
+         Class.forName("com.mysql.cj.jdbc.Driver");
+
+         try (Connection connection = DriverManager
+             .getConnection(connectionString,connectionUserName,connectionPassword);
+
+             // Step 2:Create a statement using connection object
+             PreparedStatement preparedStatement = connection
+             .prepareStatement("select lastLogin from login where username = ?")) {
+             preparedStatement.setString(1,username);
+             
+             
+
+             System.out.println(preparedStatement);
+             
+             ResultSet rs = preparedStatement.executeQuery();
+             rs.next();
+             c=rs.getString(1);
+             
+             
+            
+             
+          
+ 
+         } catch (SQLException e) {
+             // process sql exception
+        	 LOGGER.error("Error occured at getUserLastLogin function:",e);
+             printSQLException(e);
+         }
+         return c;
+     }
+     
+     //Function to get AppUserId
+     
+     public String getAppUserIds(String username,String password) throws ClassNotFoundException {
+          String a=null;
+         Class.forName("com.mysql.cj.jdbc.Driver");
+
+         try (Connection connection = DriverManager
+             .getConnection(connectionString,connectionUserName,connectionPassword);
+
+             // Step 2:Create a statement using connection object
+             PreparedStatement preparedStatement = connection
+             .prepareStatement("select appuserid from login where username = ? and password = ?")) {
+             preparedStatement.setString(1,username);
+             preparedStatement.setString(2,password);
+             
+             System.out.println(preparedStatement);
+             
+             ResultSet rs = preparedStatement.executeQuery();
+             rs.next();
+             a= rs.getString(1);
+             
+             
+         } catch (SQLException e) {
+             // process sql exception
+        	 LOGGER.error("Error occured at getAppUserIds function:",e);
+             printSQLException(e);
+         }
+         return a;
+     }
+     
+public String getPassword(String username) throws ClassNotFoundException {
+         
+         String a=null;
+         
+
+         Class.forName("com.mysql.cj.jdbc.Driver");
+
+         try (Connection connection = DriverManager
+             .getConnection(connectionString,connectionUserName,connectionPassword);
+
+             // Step 2:Create a statement using connection object
+             PreparedStatement preparedStatement = connection
+             .prepareStatement("select password from login where username = ? ")) {
+             preparedStatement.setString(1,username);
+             
+             System.out.println(preparedStatement);
+             
+             ResultSet rs = preparedStatement.executeQuery();
+             rs.next();
+             a= rs.getString(1);
+             
+
+         } catch (SQLException e) {
+             // process sql exception
+        	 LOGGER.error("Error occured at getPassword function:",e);
+             printSQLException(e);
+         }
+         return a;
+     }
+     
+     
+     
+     
+//Function to update the loggout time
+     
+public void updateLogoutTime(String currentUser) throws ClassNotFoundException {
+    
+	 String sql="update login set lastLogout=? where username=?";
+	 Date date= new Date();
+	             
+	 long time = date.getTime();
+	              
+	 Timestamp ts = new Timestamp(time);
+	 System.out.println("Current Time Stamp: "+ts);
+	 String currentTime=ts.toString();
+
+
+
+	    Class.forName("com.mysql.cj.jdbc.Driver");
+	    try (Connection connection = DriverManager
+	        .getConnection(connectionString,connectionUserName,connectionPassword);
+
+	        PreparedStatement preparedStatement = connection
+	        .prepareStatement(sql)) {
+	        preparedStatement.setString(1,currentTime);
+	        preparedStatement.setString(2,currentUser);
+	        
+	        
+	        System.out.println(preparedStatement);
+	        
+	        int rowsAffected = preparedStatement.executeUpdate() ;
+	        
+	 
+	    } catch (SQLException e) {
+	        // process sql exception
+	    	LOGGER.error("Error occured at updateLogoutTime function:",e);
+	        printSQLException(e);
+	    }
+	    
+	}
+     
+ public String getUserLastLogout(String username) throws ClassNotFoundException {
+         
+         String c=null;
+         Class.forName("com.mysql.cj.jdbc.Driver");
+
+         try (Connection connection = DriverManager
+             .getConnection(connectionString,connectionUserName,connectionPassword);
+
+             // Step 2:Create a statement using connection object
+             PreparedStatement preparedStatement = connection
+             .prepareStatement("select lastLogout from login where username = ?")) {
+             preparedStatement.setString(1,username);
+             
+             
+
+             System.out.println(preparedStatement);
+             
+             ResultSet rs = preparedStatement.executeQuery();
+             rs.next();
+             c=rs.getString(1);
+          
+ 
+         } catch (SQLException e) {
+             // process sql exception
+        	 LOGGER.error("Error occured at getUserLastLogout function:",e);
+             printSQLException(e);
+         }
+         return c;
+     }
+     
+     
+  //Funtions to update user details upon registration
+     
+ public void updateUserDetails(LoginBean userDetails) throws ClassNotFoundException {
+     
+     String firstname=userDetails.getFirstname();
+     String lastname=userDetails.getLastname();
+     String username=userDetails.getUsername();
+     String password=userDetails.getPassword();
+     String address=userDetails.getAddress();
+     String contact=userDetails.getContact();
+     String id=userDetails.getAppuserid();
+     String email=userDetails.getEmail();
+     String userrole=userDetails.getRole();
+     
+     Class.forName("com.mysql.cj.jdbc.Driver");
+     try (Connection connection = DriverManager.getConnection(connectionString,connectionUserName,connectionPassword);
+    	
+         PreparedStatement preparedStatement = connection
+         .prepareStatement("insert into login(username,password,firstname,lastname,address,contactnumber,appuserid,emailid,role) values(?,?,?,?,?,?,?,?,?)")) {
+         preparedStatement.setString(1, username);
+         preparedStatement.setString(2, password);
+         preparedStatement.setString(3, firstname);
+         preparedStatement.setString(4, lastname);
+         preparedStatement.setString(5, address);
+         preparedStatement.setString(6, contact);
+         preparedStatement.setString(7, id);
+         preparedStatement.setString(8, email);
+         preparedStatement.setString(9, userrole);
+         
+         System.out.println(preparedStatement);
+         
+         preparedStatement.executeUpdate();
+         
+         
+         
+     } catch (SQLException e) {
+         // process sql exception
+    	 LOGGER.error("Error occured at updateUserDetails function:",e);
+         printSQLException(e);
+     }
+ }
+     
+ //Function to get all user details
+     
+public String getDetailsBackendFirstName(String username) throws ClassNotFoundException {
+         
+         String firstname=null;
+         
+         Class.forName("com.mysql.cj.jdbc.Driver");
+
+         try (Connection connection = DriverManager
+             .getConnection(connectionString,connectionUserName,connectionPassword);
+
+             // Step 2:Create a statement using connection object
+             PreparedStatement preparedStatement = connection
+             .prepareStatement("select firstname from login where username = ?")) {
+             preparedStatement.setString(1,username);
+             
+             System.out.println(preparedStatement);
+             
+             ResultSet rs = preparedStatement.executeQuery();
+             rs.next();
+             firstname=rs.getString(1);
+             
+           } catch (SQLException e) {
+             // process sql exception
+        	 LOGGER.error("Error occured at getDetailsBackendFirstName function:",e);
+             printSQLException(e);
+         }
+         return firstname;  
+     }
+
+public String getDetailsBackendLastName(String username) throws ClassNotFoundException {
+    
+    String lastname=null;
+    
+    Class.forName("com.mysql.cj.jdbc.Driver");
+
+    try (Connection connection = DriverManager
+        .getConnection(connectionString,connectionUserName,connectionPassword);
+
+        // Step 2:Create a statement using connection object
+        PreparedStatement preparedStatement = connection
+        .prepareStatement("select lastname from login where username = ?")) {
+        preparedStatement.setString(1,username);
+        
+        
+
+        System.out.println(preparedStatement);
+        
+        ResultSet rs = preparedStatement.executeQuery();
+        rs.next();
+        lastname=rs.getString(1);
+        
+      } catch (SQLException e) {
+        // process sql exception
+    	LOGGER.error("Error occured at getDetailsBackendLastName function:",e);
+        printSQLException(e);
+    }
+    return lastname;  
+}
+
+public String getDetailsAddress(String username) throws ClassNotFoundException {
+    
+    String address=null;
+    
+    Class.forName("com.mysql.cj.jdbc.Driver");
+
+    try (Connection connection = DriverManager
+        .getConnection(connectionString,connectionUserName,connectionPassword);
+
+        // Step 2:Create a statement using connection object
+        PreparedStatement preparedStatement = connection
+        .prepareStatement("select address from login where username = ?")) {
+        preparedStatement.setString(1,username);
+        
+        
+
+        System.out.println(preparedStatement);
+        
+        ResultSet rs = preparedStatement.executeQuery();
+        rs.next();
+        address=rs.getString(1);
+        
+      } catch (SQLException e) {
+        // process sql exception
+    	LOGGER.error("Error occured at getDetailsAddress function:",e);
+        printSQLException(e);
+    }
+    return address;  
+}
+
+public String getDetailsEmailId(String username) throws ClassNotFoundException {
+    
+    String email=null;
+    
+    Class.forName("com.mysql.cj.jdbc.Driver");
+
+    try (Connection connection = DriverManager
+        .getConnection(connectionString,connectionUserName,connectionPassword);
+
+        // Step 2:Create a statement using connection object
+        PreparedStatement preparedStatement = connection
+        .prepareStatement("select emailid from login where username = ?")) {
+        preparedStatement.setString(1,username);
+        
+        
+
+        System.out.println(preparedStatement);
+        
+        ResultSet rs = preparedStatement.executeQuery();
+        rs.next();
+        email=rs.getString(1);
+        
+      } catch (SQLException e) {
+        // process sql exception
+        LOGGER.error("Error occured at getDetailsEmailId function:",e);
+        printSQLException(e);
+    }
+    return email;  
+}
+
+public String getDetailsNumber(String username) throws ClassNotFoundException {
+    
+    String number=null;
+    
+    Class.forName("com.mysql.cj.jdbc.Driver");
+
+    try (Connection connection = DriverManager
+        .getConnection(connectionString,connectionUserName,connectionPassword);
+
+        // Step 2:Create a statement using connection object
+        PreparedStatement preparedStatement = connection
+        .prepareStatement("select contactnumber from login where username = ?")) {
+        preparedStatement.setString(1,username);
+        
+        
+
+        System.out.println(preparedStatement);
+        
+        ResultSet rs = preparedStatement.executeQuery();
+        rs.next();
+        number=rs.getString(1);
+        
+      } catch (SQLException e) {
+        // process sql exception
+    	LOGGER.error("Error occured at getDetailsNumber function:",e);
+        printSQLException(e);
+    }
+    return number;  
+}
+    
+//Function to get Role of user from backend
+
+public String getUserRole(String username) throws ClassNotFoundException {
+    
+    String role=null;
+    
+    Class.forName("com.mysql.cj.jdbc.Driver");
+
+    try (Connection connection = DriverManager
+        .getConnection(connectionString,connectionUserName,connectionPassword);
+
+        // Step 2:Create a statement using connection object
+        PreparedStatement preparedStatement = connection
+        .prepareStatement("select role from login where username = ?")) {
+        preparedStatement.setString(1,username);
+        
+        
+
+        System.out.println(preparedStatement);
+        
+        ResultSet rs = preparedStatement.executeQuery();
+        rs.next();
+        role=rs.getString(1);
+        
+        
+      } catch (SQLException e) {
+        // process sql exception
+    	LOGGER.error("Error occured at getUserRole function:",e);
+        printSQLException(e);
+    }
+    return role;  
+}
+
+//Function to get pages accessible by a particular role
+
+public String getUserRolePages(String userrole) throws ClassNotFoundException {
+    
+    String role=null;
+    
+    Class.forName("com.mysql.cj.jdbc.Driver");
+
+    try (Connection connection = DriverManager
+        .getConnection(connectionString,connectionUserName,connectionPassword);
+
+        // Step 2:Create a statement using connection object
+        PreparedStatement preparedStatement = connection
+        .prepareStatement("select pages from useraccess where rolename = ?")) {
+        preparedStatement.setString(1,userrole);
+        
+        
+
+        System.out.println(preparedStatement);
+        
+        ResultSet rs = preparedStatement.executeQuery();
+        rs.next();
+        role=rs.getString(1);
+        
+        
+      } catch (SQLException e) {
+        // process sql exception
+    	LOGGER.error("Error occured at getUserRolePages function:",e);
+        printSQLException(e);
+    }
+    return role;  
+}
+
+
+
+private void printSQLException(SQLException ex) {
+        for (Throwable e: ex) {
+            if (e instanceof SQLException) {
+                e.printStackTrace(System.err);
+                LOGGER.error("SQLState: " + ((SQLException) e).getSQLState());
+                LOGGER.error("Error Code: " + ((SQLException) e).getErrorCode());
+                LOGGER.error("Message: " + e.getMessage());
+                System.err.println("SQLState: " + ((SQLException) e).getSQLState());
+                System.err.println("Error Code: " + ((SQLException) e).getErrorCode());
+                System.err.println("Message: " + e.getMessage());
+                Throwable t = ex.getCause();
+                while (t != null) {
+                    System.out.println("Cause: " + t);
+                    LOGGER.error("Cause: " + t);
+                    t = t.getCause();
+                     
+                }
+            }
+        }
+    }
+}
